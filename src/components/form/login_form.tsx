@@ -11,11 +11,16 @@ import { FieldError, FieldLabel } from "../ui/field"
 import { LoginSchema } from "@/validation/auth.validation"
 import { useState } from "react"
 import { Button } from "@base-ui/react"
+import { useLogin } from "@/hooks/auth.hooks"
+import Link from "next/link"
+import { toast } from "../ui/toast"
 
 export function LoginForm({
     className,
     ...props
 }: React.ComponentProps<"div">) {
+
+    const { mutate, isPending } = useLogin()
     const form = useForm({
         defaultValues: {
             email: "",
@@ -24,12 +29,45 @@ export function LoginForm({
         validators: {
             onChange: LoginSchema
         },
-        onSubmit: (value) => {
-            console.log(value)
+        onSubmit: ({ value }) => {
+            const payload = {
+                email: value.email,
+                password: value.password
+            }
+            mutate(payload, {
+
+                onSuccess:(res)=>{
+                    toast.add({
+                        positionerProps:{
+                            side:"top",
+                            align:"center",
+                            
+                        },
+                        type:"success",
+                        title:"Login Success",
+                        description:res.message ?? "User login successful"
+                    })
+               
+                },
+               
+                onError: (err) => {
+                      toast.add({
+                        positionerProps:{
+                            side:"top",
+                            align:"center",
+                            
+                        },
+                        type:"error",
+                        title:"Login failure",
+                        description:err.data?.message ?? "Something went wrong"
+                    })
+                    
+                }
+            })
         },
     })
 
-    const [showPassword,setShowPassword] = useState(false)
+    const [showPassword, setShowPassword] = useState(false)
 
     return (
         <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -116,7 +154,7 @@ export function LoginForm({
                                             {isValid && <FieldError errors={field.state.meta.errors}></FieldError>}
                                         </div>
 
-                                        <Button  className="absolute right-3 top-10 text-rose-600 size-5"  type="button" onClick={()=>setShowPassword(!showPassword)}>
+                                        <Button className="absolute right-3 top-10 text-rose-600 size-5" type="button" onClick={() => setShowPassword(!showPassword)}>
                                             {showPassword ? <EyeOff className="w-full"></EyeOff> : <Eye className="w-full"></Eye>}
                                         </Button>
                                     </div>
@@ -130,8 +168,10 @@ export function LoginForm({
                             className="h-11 w-full bg-primary font-semibold text-primary-foreground shadow-sm transition-opacity hover:bg-primary/90"
                             type="submit"
                         >
-                            Login
+                            {isPending ? "Login..." : "Login"}
                         </Button>
+
+                        <span className="text-center mt-5 text-[12px]">Don't have any account? <Link className="underline" href="/register">Register Now</Link></span>
                     </form>
 
 

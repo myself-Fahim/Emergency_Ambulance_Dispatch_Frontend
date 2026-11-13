@@ -9,11 +9,14 @@ import { useForm } from '@tanstack/react-form';
 import {  RegisterSchema } from '@/validation/auth.validation';
 import { cn } from 'cn';
 import { Button } from '@base-ui/react';
+import { useRegister } from '@/hooks/auth.hooks';
 
 const Register_Form = ({
     className,
     ...props
 }: React.ComponentProps<"div">) => {
+
+    const {mutate , isPending} = useRegister()
 
     const form = useForm({
         defaultValues: {
@@ -25,7 +28,21 @@ const Register_Form = ({
             onChange: RegisterSchema
         },
         onSubmit: ({value}) => {
-            console.log(value)
+            const payload = {
+                name : value.name,
+                email : value.email,
+                password : value.password
+            }
+            mutate(payload,{
+
+                onSuccess:(res)=>{
+                   console.log(res.data ?? res.message);
+                },
+                onError:(err)=>{
+                    console.log(err.data?.message);
+                }
+
+            })
         },
     })
 

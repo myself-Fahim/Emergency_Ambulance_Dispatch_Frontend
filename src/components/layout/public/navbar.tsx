@@ -13,7 +13,7 @@ const Navbar = () => {
 
 
 
-        <header className='flex justify-between px-30 py-2'>
+        <header className='flex justify-between px-30 pt-5'>
 
             <div>
                 <h1>Ambulancia</h1>

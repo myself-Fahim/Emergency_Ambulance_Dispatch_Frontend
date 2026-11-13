@@ -1,7 +1,13 @@
 import { ofetch } from "ofetch";
 
+
+const baseURL = process.env.NEXT_PUBLIC_BACKEND_URL
+
+
+
 const ofetchClient = ofetch.create({
-    baseURL: process.env.BACKEND_URL
+    baseURL,
+    credentials:"include"
 })
 
 export default ofetchClient
