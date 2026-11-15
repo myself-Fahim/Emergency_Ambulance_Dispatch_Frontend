@@ -6,17 +6,18 @@ import { FieldError, FieldLabel } from '../ui/field';
 import { Input } from '../ui/input';
 
 import { useForm } from '@tanstack/react-form';
-import {  RegisterSchema } from '@/validation/auth.validation';
+import { RegisterSchema } from '@/validation/auth.validation';
 import { cn } from 'cn';
 import { Button } from '@base-ui/react';
 import { useRegister } from '@/hooks/auth.hooks';
+import { toast } from '../ui/toast';
 
 const Register_Form = ({
     className,
     ...props
 }: React.ComponentProps<"div">) => {
 
-    const {mutate , isPending} = useRegister()
+    const {mutate,isPending} = useRegister()
 
     const form = useForm({
         defaultValues: {
@@ -27,19 +28,26 @@ const Register_Form = ({
         validators: {
             onChange: RegisterSchema
         },
-        onSubmit: ({value}) => {
+        onSubmit: ({ value }) => {
             const payload = {
-                name : value.name,
-                email : value.email,
-                password : value.password
+                name: value.name,
+                email: value.email,
+                password: value.password
             }
-            mutate(payload,{
+            mutate(payload, {
 
-                onSuccess:(res)=>{
-                   console.log(res.data ?? res.message);
+                onSuccess: (res) => {
+                    console.log(res.data ?? res.message);
+                      toast.add({
+                        type:"success",
+                        description:res.message ?? "verification OTP sent to your email"
+                    })
                 },
-                onError:(err)=>{
-                    console.log(err.data?.message);
+                onError: (err) => {
+                    toast.add({
+                        type:"error",
+                        description:err.data?.message ?? "Something went wrong"
+                    })
                 }
 
             })
@@ -177,10 +185,11 @@ const Register_Form = ({
 
                         {/* Submit */}
                         <Button
+                            disabled={isPending}
                             className="h-11 w-full bg-primary font-semibold text-primary-foreground shadow-sm transition-opacity hover:bg-primary/90"
                             type="submit"
                         >
-                            Register
+                            {isPending ? "Registering..." : "Register"}
                         </Button>
                     </form>
 

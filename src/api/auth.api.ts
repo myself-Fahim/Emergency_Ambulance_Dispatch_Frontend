@@ -15,3 +15,14 @@ export const registerApi = (payload : RegisterPayload) =>{
         body:payload
     })
 }
+
+
+export const logoutApi = () =>{
+    return ofetchClient("/auth/logout",{
+        method:"POST"
+    })
+}
+
+export const getMeApi = () =>{
+    return ofetchClient("/auth/me")
+}

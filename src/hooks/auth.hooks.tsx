@@ -1,7 +1,7 @@
 
-import { loginApi, registerApi } from "@/api/auth.api"
+import { getMeApi, loginApi, logoutApi, registerApi } from "@/api/auth.api"
 import { LoginError, LoginPayload, LoginResponse, RegisterPayload } from "@/types/auth.types"
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import type { FetchError } from "ofetch"
 
 
@@ -13,8 +13,26 @@ export const useLogin = () => {
 }
 
 
-export const useRegister = () =>{
+export const useRegister = () => {
   return useMutation<LoginResponse, FetchError<LoginError>, RegisterPayload>({
-    mutationFn:registerApi
+    mutationFn: registerApi
   })
+}
+
+
+export const useLogout = () => {
+  return useMutation({
+    mutationFn: logoutApi,
+   
+  })
+}
+
+export const useGetMe = () => {
+  {
+    return useQuery({
+      queryKey: ['user'],
+      queryFn: getMeApi,
+      retry:false
+    })
+  }
 }
