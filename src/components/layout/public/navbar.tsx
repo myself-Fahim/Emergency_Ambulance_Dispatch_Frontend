@@ -17,6 +17,7 @@ const Navbar = () => {
     const { mutate, isPending } = useLogout()
 
     const { data, isLoading } = useGetMe()
+    console.log(data);
 
     const user = data?.data;
 

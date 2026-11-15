@@ -23,6 +23,13 @@ export const logoutApi = () =>{
     })
 }
 
+export const googleLoginApi = (payload : {idToken : string}) =>{
+    return ofetchClient("/auth/google",{
+        method:"POST",
+        body:payload
+    })
+}
+
 export const getMeApi = () =>{
     return ofetchClient("/auth/me")
 }

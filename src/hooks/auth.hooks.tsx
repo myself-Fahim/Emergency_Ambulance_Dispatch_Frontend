@@ -1,7 +1,7 @@
 
-import { getMeApi, loginApi, logoutApi, registerApi } from "@/api/auth.api"
+import { getMeApi, googleLoginApi, loginApi, logoutApi, registerApi } from "@/api/auth.api"
 import { LoginError, LoginPayload, LoginResponse, RegisterPayload } from "@/types/auth.types"
-import { useMutation, useQuery } from "@tanstack/react-query"
+import { QueryClient, useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import type { FetchError } from "ofetch"
 
 
@@ -9,6 +9,7 @@ import type { FetchError } from "ofetch"
 export const useLogin = () => {
   return useMutation<LoginResponse, FetchError<LoginError>, LoginPayload>({
     mutationFn: loginApi,
+  
   })
 }
 
@@ -27,12 +28,26 @@ export const useLogout = () => {
   })
 }
 
+export const useGoogleLogin = () =>{
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn:googleLoginApi,
+    onSuccess: async () => {
+    await queryClient.invalidateQueries({
+      queryKey: ["user"],
+      type: "active",
+    })
+  },
+  })
+}
+
 export const useGetMe = () => {
   {
     return useQuery({
       queryKey: ['user'],
       queryFn: getMeApi,
-      retry:false
+      retry:false,
+      refetchOnMount:"always"
     })
   }
 }

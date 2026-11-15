@@ -7,13 +7,16 @@ import { useForm } from "@tanstack/react-form"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "../ui/input"
 
-import { FieldError, FieldLabel } from "../ui/field"
+import { FieldError, FieldLabel, FieldSeparator } from "../ui/field"
 import { LoginSchema } from "@/validation/auth.validation"
 import { useState } from "react"
 import { Button } from "@base-ui/react"
-import { useLogin } from "@/hooks/auth.hooks"
+import { useGoogleLogin, useLogin } from "@/hooks/auth.hooks"
 import Link from "next/link"
 import { toast } from "../ui/toast"
+import { GoogleLogin } from "@react-oauth/google"
+import { useQueryClient } from "@tanstack/react-query"
+
 
 export function LoginForm({
     className,
@@ -21,6 +24,12 @@ export function LoginForm({
 }: React.ComponentProps<"div">) {
 
     const { mutate, isPending } = useLogin()
+    const { mutate: googleLogin, isPending: goolePending } = useGoogleLogin()
+    const queryClient = useQueryClient()
+
+
+
+
     const form = useForm({
         defaultValues: {
             email: "",
@@ -36,36 +45,88 @@ export function LoginForm({
             }
             mutate(payload, {
 
-                onSuccess:(res)=>{
+                onSuccess: (res) => {
                     toast.add({
-                        positionerProps:{
-                            side:"top",
-                            align:"center",
-                            
+                        positionerProps: {
+                            side: "top",
+                            align: "center",
+
                         },
-                        type:"success",
-                        title:"Login Success",
-                        description:res.message ?? "User login successful"
+                        type: "success",
+                        title: "Login Success",
+                        description: res.message ?? "User login successful"
                     })
-               
+
                 },
-               
+
                 onError: (err) => {
-                      toast.add({
-                        positionerProps:{
-                            side:"top",
-                            align:"center",
-                            
+                    toast.add({
+                        positionerProps: {
+                            side: "top",
+                            align: "center",
+
                         },
-                        type:"error",
-                        title:"Login failure",
-                        description:err.data?.message ?? "Something went wrong"
+                        type: "error",
+                        title: "Login failure",
+                        description: err.data?.message ?? "Something went wrong"
                     })
-                    
+
                 }
             })
         },
     })
+
+    const handleGoogleSuccess = (credentialResponse: {
+        credential?: string
+    }) => {
+
+        if (!credentialResponse.credential) {
+            toast.add({
+                title: " Login Failed",
+                description: "Something went wrong",
+                type: "error"
+            })
+            return
+        }
+
+        const idToken = credentialResponse.credential
+        const payload = {
+            idToken
+        }
+
+        googleLogin(payload, {
+            onSuccess: (res) => {
+                console.log(res);
+                toast.add({
+                    title: " Login Success",
+                    description: res.data.message ?? "User logged in successful",
+                    type: "success"
+                })
+
+                
+
+            },
+
+            onError: (err) => {
+                toast.add({
+                    title: " Login Failed",
+                    description: err.message ?? "Something went wrong",
+                    type: "error"
+                })
+            }
+
+        })
+
+    }
+
+
+    const handleGoogleError = () => {
+        toast.add({
+            title: "Google Login Failed",
+            description: "Something went wrong",
+            type: "error"
+        })
+    }
 
     const [showPassword, setShowPassword] = useState(false)
 
@@ -165,14 +226,21 @@ export function LoginForm({
 
                         {/* Submit */}
                         <Button
-                            className="h-11 w-full bg-primary font-semibold text-primary-foreground shadow-sm transition-opacity hover:bg-primary/90"
+                            className="h-11 mb-5 w-full bg-primary font-semibold text-primary-foreground shadow-sm transition-opacity hover:bg-primary/90"
                             type="submit"
                         >
                             {isPending ? "Login..." : "Login"}
                         </Button>
 
+                        <FieldSeparator className="mb-5">OR</FieldSeparator>
+
+                        <GoogleLogin onSuccess={handleGoogleSuccess} onError={handleGoogleError}></GoogleLogin>
+
                         <span className="text-center mt-5 text-[12px]">Don't have any account? <Link className="underline" href="/register">Register Now</Link></span>
                     </form>
+
+
+
 
 
                     {/* ---------- Brand panel ---------- */}
