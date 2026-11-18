@@ -22,3 +22,7 @@ export type RegisterPayload = {
   email: string
   password: string
 }
+export type verifyEmailPayload = {
+  email: string
+  otp:string
+}

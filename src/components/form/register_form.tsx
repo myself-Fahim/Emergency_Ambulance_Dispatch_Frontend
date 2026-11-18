@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent } from '../ui/card';
 import { Eye, EyeOff, Key, LockKeyhole } from 'lucide-react';
-import { FieldError, FieldLabel } from '../ui/field';
+import { FieldError, FieldLabel, FieldSeparator } from '../ui/field';
 import { Input } from '../ui/input';
 
 import { useForm } from '@tanstack/react-form';
@@ -11,13 +11,17 @@ import { cn } from 'cn';
 import { Button } from '@base-ui/react';
 import { useRegister } from '@/hooks/auth.hooks';
 import { toast } from '../ui/toast';
+import GoogleLoginComponent from '../reusable/GoogleLogin';
+import { useRouter } from 'next/navigation';
+import { Spinner } from '../ui/spinner';
 
 const Register_Form = ({
     className,
     ...props
 }: React.ComponentProps<"div">) => {
 
-    const {mutate,isPending} = useRegister()
+    const { mutate, isPending } = useRegister()
+    const router = useRouter()
 
     const form = useForm({
         defaultValues: {
@@ -38,15 +42,21 @@ const Register_Form = ({
 
                 onSuccess: (res) => {
                     console.log(res.data ?? res.message);
-                      toast.add({
-                        type:"success",
-                        description:res.message ?? "verification OTP sent to your email"
+                    toast.add({
+                        type: "success",
+                        description: res.message ?? "verification OTP sent to your email"
                     })
+
+                    const params = new URLSearchParams({email:value.email})
+
+                    router.push(`/register/verify-otp?${params}`)
+
                 },
+
                 onError: (err) => {
                     toast.add({
-                        type:"error",
-                        description:err.data?.message ?? "Something went wrong"
+                        type: "error",
+                        description: err.data?.message ?? "Something went wrong"
                     })
                 }
 
@@ -186,11 +196,18 @@ const Register_Form = ({
                         {/* Submit */}
                         <Button
                             disabled={isPending}
-                            className="h-11 w-full bg-primary font-semibold text-primary-foreground shadow-sm transition-opacity hover:bg-primary/90"
+                            className="rounded-md h-11 w-full bg-primary font-semibold text-primary-foreground shadow-sm transition-opacity hover:bg-primary/90"
                             type="submit"
                         >
-                            {isPending ? "Registering..." : "Register"}
+                            {isPending ?  <div className="flex justify-center">
+                             <Spinner className="size-5 text-white font-bold"></Spinner> 
+                           </div> : "Register"}
                         </Button>
+
+
+                        <FieldSeparator className="my-3">OR</FieldSeparator>
+
+                        <GoogleLoginComponent></GoogleLoginComponent>
                     </form>
 
 

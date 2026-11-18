@@ -11,11 +11,14 @@ import { FieldError, FieldLabel, FieldSeparator } from "../ui/field"
 import { LoginSchema } from "@/validation/auth.validation"
 import { useState } from "react"
 import { Button } from "@base-ui/react"
-import { useGoogleLogin, useLogin } from "@/hooks/auth.hooks"
+import { useForgotPassword, useLogin } from "@/hooks/auth.hooks"
 import Link from "next/link"
 import { toast } from "../ui/toast"
-import { GoogleLogin } from "@react-oauth/google"
-import { useQueryClient } from "@tanstack/react-query"
+
+import GoogleLoginComponent from "../reusable/GoogleLogin"
+import { Spinner } from "../ui/spinner"
+import { useRouter } from "next/navigation"
+
 
 
 export function LoginForm({
@@ -24,9 +27,11 @@ export function LoginForm({
 }: React.ComponentProps<"div">) {
 
     const { mutate, isPending } = useLogin()
-    const { mutate: googleLogin, isPending: goolePending } = useGoogleLogin()
-    const queryClient = useQueryClient()
 
+    const router = useRouter()
+    const [showPassword, setShowPassword] = useState(false)
+    const [forgotError, setForgotError] = useState("")
+    const { mutate: forgotPass, isPending: forgotPending } = useForgotPassword()
 
 
 
@@ -57,6 +62,8 @@ export function LoginForm({
                         description: res.message ?? "User login successful"
                     })
 
+                    router.push("/")
+
                 },
 
                 onError: (err) => {
@@ -76,59 +83,51 @@ export function LoginForm({
         },
     })
 
-    const handleGoogleSuccess = (credentialResponse: {
-        credential?: string
-    }) => {
 
-        if (!credentialResponse.credential) {
-            toast.add({
-                title: " Login Failed",
-                description: "Something went wrong",
-                type: "error"
-            })
+    const handleForgotPassword = () => {
+        const email = form.getFieldValue("email").trim()
+        if (!email) {
+            setForgotError("Enter your email first to reset your password")
+            document.getElementById("email")?.focus()
             return
         }
 
-        const idToken = credentialResponse.credential
-        const payload = {
-            idToken
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            setForgotError("Please enter a valid email address")
+            document.getElementById("email")?.focus()
+            return
         }
 
-        googleLogin(payload, {
+        const payload = {
+            email
+        }
+
+        forgotPass(payload, {
             onSuccess: (res) => {
-                console.log(res);
                 toast.add({
-                    title: " Login Success",
-                    description: res.data.message ?? "User logged in successful",
+                    title: "Forget password success",
+                    description: res.message ?? "OTP sent to your email",
                     type: "success"
                 })
 
-                
+                const params = new URLSearchParams({ email })
+                router.push(`/login/forgot-password?${params}`)
 
             },
 
             onError: (err) => {
                 toast.add({
-                    title: " Login Failed",
-                    description: err.message ?? "Something went wrong",
+                    title: "Forget password error",
+                    description: err.data?.message ?? "Something went wrong",
                     type: "error"
                 })
+
             }
-
         })
 
+
+
     }
-
-
-    const handleGoogleError = () => {
-        toast.add({
-            title: "Google Login Failed",
-            description: "Something went wrong",
-            type: "error"
-        })
-    }
-
-    const [showPassword, setShowPassword] = useState(false)
 
     return (
         <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -174,11 +173,15 @@ export function LoginForm({
                                             placeholder="you@example.com"
                                             value={field.state.value}
                                             autoComplete="nope"
-                                            onChange={(e) => field.handleChange(e.target.value)}
+                                            onChange={(e) => {
+                                                field.handleChange(e.target.value)
+                                                setForgotError("")
+
+                                            }}
                                             required
                                         />
-
                                         {isValid && <FieldError errors={field.state.meta.errors}></FieldError>}
+                                        {forgotError && <p className="text-sm text-red-600">{forgotError} !</p>}
                                     </div>
 
 
@@ -192,15 +195,23 @@ export function LoginForm({
 
                                 const isValid = field.state.meta.isTouched && !field.state.meta.isValid && field.state.value.length > 0
                                 return (
-                                    <div className="mb-5 relative">
+                                    <div className="mb-3 relative">
 
                                         <div className=" flex flex-col gap-2 ">
-                                            <FieldLabel
-                                                htmlFor={field.name}
-                                                className="text-sm font-medium text-foreground"
-                                            >
-                                                Password
-                                            </FieldLabel>
+                                            <div className="flex items-center justify-between">
+                                                <FieldLabel
+                                                    htmlFor={field.name}
+                                                    className="text-sm font-medium text-foreground"
+                                                >
+                                                    Password
+                                                </FieldLabel>
+                                                <Button onClick={handleForgotPassword}
+                                                    className="text-xs font-medium text-primary underline-offset-4 transition-colors hover:text-primary/80 hover:underline focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
+                                                >
+                                                    Forgot password?
+                                                </Button>
+                                            </div>
+
                                             <Input
                                                 id={field.name}
                                                 className="h-11 border-input bg-background focus-visible:border-primary focus-visible:ring-primary/30"
@@ -224,17 +235,25 @@ export function LoginForm({
                             }}
                         </form.Field>
 
+
+
                         {/* Submit */}
                         <Button
-                            className="h-11 mb-5 w-full bg-primary font-semibold text-primary-foreground shadow-sm transition-opacity hover:bg-primary/90"
+                            disabled={isPending}
+                            className={`rounded-md h-11 mb-5 w-full bg-primary font-semibold text-primary-foreground shadow-sm transition-opacity hover:bg-primary/90 ${isPending && "border-l-indigo-400"}`}
                             type="submit"
                         >
-                            {isPending ? "Login..." : "Login"}
+                            {isPending || forgotPending ?
+                                <div className="flex justify-center">
+                                    <Spinner className="size-5 text-white font-bold"></Spinner>
+                                </div>
+                                : "Login"}
                         </Button>
 
                         <FieldSeparator className="mb-5">OR</FieldSeparator>
 
-                        <GoogleLogin onSuccess={handleGoogleSuccess} onError={handleGoogleError}></GoogleLogin>
+                        <GoogleLoginComponent></GoogleLoginComponent>
+
 
                         <span className="text-center mt-5 text-[12px]">Don't have any account? <Link className="underline" href="/register">Register Now</Link></span>
                     </form>
