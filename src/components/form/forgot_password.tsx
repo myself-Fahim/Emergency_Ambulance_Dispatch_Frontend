@@ -1,7 +1,8 @@
+/** biome-ignore-all lint/correctness/useExhaustiveDependencies: <explanation> */
 "use client";
 import { REGEXP_ONLY_DIGITS } from "input-otp";
 import { Eye, EyeOff } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import {
@@ -11,10 +12,27 @@ import {
 } from "@/components/ui/input-otp";
 import { useForm } from "@tanstack/react-form";
 import { forgotPasswordSchema } from "@/validation/auth.validation";
+import { useRouter, useSearchParams } from "next/navigation";
+
+import { useResetPassword } from "@/hooks/auth.hooks";
+import { toast } from "../ui/toast";
+import { Spinner } from "../ui/spinner";
 
 const ForgotPasswordForm = () => {
-  
+
     const [showPassword, setShowPassword] = useState(false);
+    const searchParams = useSearchParams()
+    const router = useRouter()
+    const {mutate:resetPassword,isPending:resetPending} = useResetPassword()
+    const email = searchParams.get("email") || ""
+
+    useEffect(()=>{
+        if(!email){
+           router.push("/")
+        }
+    },[email])
+
+ 
 
     const form = useForm({
         defaultValues: {
@@ -22,12 +40,35 @@ const ForgotPasswordForm = () => {
             newPassword: ""
         },
 
-        validators:{
-            onChange:forgotPasswordSchema
+        validators: {
+            onChange: forgotPasswordSchema
         },
 
         onSubmit: ({ value }) => {
-            console.log(value);
+            const paylaod = {
+                email,
+                otp : value.otp,
+                newPassword : value.newPassword
+            }
+            resetPassword(paylaod,{
+                 onSuccess: (res) => {
+                    console.log(res);
+                    toast.add({
+                        title:"Reset Success",
+                        type: "success",
+                        description: res.message ?? "Password reset successfully"
+                    })
+                    router.push('/login')
+                },
+
+                onError: (err) => {
+                    toast.add({
+                        title:"Reset error",
+                        type: "error",
+                        description: err.data?.message ?? "Something went wrong"
+                    })
+                }
+            })
         }
     })
 
@@ -112,7 +153,7 @@ const ForgotPasswordForm = () => {
             <form.Field name="newPassword">
                 {
                     (field) => {
-                          const isValid = field.state.meta.isTouched && !field.state.meta.isValid && field.state.value.length > 0
+                        const isValid = field.state.meta.isTouched && !field.state.meta.isValid && field.state.value.length > 0
                         return (
                             <div className="relative mb-6 flex flex-col gap-2">
                                 <FieldLabel
@@ -131,7 +172,7 @@ const ForgotPasswordForm = () => {
                                     placeholder="Enter new password"
                                     autoComplete="new-password"
                                     className="h-11 border-input bg-background pr-10 focus-visible:border-primary focus-visible:ring-primary/30"
-                                  
+
                                     required
                                 />
                                 <button
@@ -146,7 +187,7 @@ const ForgotPasswordForm = () => {
                                         <Eye className="size-5" />
                                     )}
                                 </button>
-                                 {isValid && <FieldError errors={field.state.meta.errors}></FieldError>}
+                                {isValid && <FieldError errors={field.state.meta.errors}></FieldError>}
                             </div>
 
                         )
@@ -155,10 +196,13 @@ const ForgotPasswordForm = () => {
             </form.Field>
 
             <button
+
                 type="submit"
                 className="h-11 w-full rounded-md bg-primary font-semibold text-primary-foreground shadow-sm transition-opacity hover:bg-primary/90"
             >
-                Reset password
+                {resetPending ? <div className="flex justify-center">
+                                    <Spinner className="size-5 text-white font-bold"></Spinner>
+                                </div>:"Reset Passoword"}
             </button>
         </form>
     );

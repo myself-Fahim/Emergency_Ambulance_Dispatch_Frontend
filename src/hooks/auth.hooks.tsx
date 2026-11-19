@@ -1,6 +1,6 @@
 
-import { forgotPasswordApi, getMeApi, googleLoginApi, loginApi, logoutApi, registerApi, verifyRegistrationOtp } from "@/api/auth.api"
-import { LoginError, LoginPayload, LoginResponse, RegisterPayload, verifyEmailPayload } from "@/types/auth.types"
+import { forgotPasswordApi, getMeApi, googleLoginApi, loginApi, logoutApi, registerApi, resetPasswordApi, verifyRegistrationOtp } from "@/api/auth.api"
+import { LoginError, LoginPayload, LoginResponse, RegisterPayload, ResetPasswordPayload, verifyEmailPayload } from "@/types/auth.types"
 import { QueryClient, useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import type { FetchError } from "ofetch"
 
@@ -34,11 +34,21 @@ export const useForgotPassword = () => {
   })
 }
 
+
+export const useResetPassword = () => {
+  return useMutation<LoginResponse, FetchError<LoginError>, ResetPasswordPayload>({
+    mutationFn: resetPasswordApi,
+   
+  })
+}
+
+
 export const useEmailVerify = () =>{
   return useMutation<LoginResponse, FetchError<LoginError>, verifyEmailPayload>({
     mutationFn:verifyRegistrationOtp
   })
 }
+
 
 export const useGoogleLogin = () =>{
   const queryClient = useQueryClient()

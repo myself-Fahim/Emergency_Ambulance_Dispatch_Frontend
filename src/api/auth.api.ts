@@ -1,5 +1,5 @@
 import ofetchClient from "@/lib/ofetch"
-import { LoginPayload, LoginResponse, RegisterPayload, verifyEmailPayload } from "@/types/auth.types"
+import { LoginPayload, LoginResponse, RegisterPayload, ResetPasswordPayload, verifyEmailPayload } from "@/types/auth.types"
 
 export const loginApi = (payload: LoginPayload) => {
     return ofetchClient<LoginResponse>("/auth/login", {
@@ -44,6 +44,14 @@ export const forgotPasswordApi = (payload : {email:string}) =>{
         body:payload
     })
 }
+
+export const resetPasswordApi = (payload : ResetPasswordPayload) =>{
+    return ofetchClient("/auth/reset-password",{
+        method:"POST",
+        body:payload
+    })
+}
+
 
 
 

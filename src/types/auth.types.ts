@@ -22,6 +22,13 @@ export type RegisterPayload = {
   email: string
   password: string
 }
+
+export type ResetPasswordPayload = {
+  email: string
+  newPassword: string
+  otp:string
+}
+
 export type verifyEmailPayload = {
   email: string
   otp:string
