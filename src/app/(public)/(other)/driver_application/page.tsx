@@ -1,6 +1,7 @@
 import { ArrowLeft, Siren } from "lucide-react";
 import Link from "next/link";
 import Driver_Application_Form from "@/components/form/driver_application_form";
+import { Suspense } from "react";
 
 const Driver_Application = () => {
   return (
@@ -26,7 +27,9 @@ const Driver_Application = () => {
           </p>
         </div>
 
-        <Driver_Application_Form />
+        <Suspense fallback={<p>Loading....</p>}>
+          <Driver_Application_Form />
+        </Suspense>
       </div>
     </div>
   );

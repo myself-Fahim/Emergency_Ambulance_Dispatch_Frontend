@@ -7,13 +7,14 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useEmailVerify } from '@/hooks/auth.hooks';
 import { toast } from '../ui/toast';
 import { Spinner } from '../ui/spinner';
-import { RotateCcw } from 'lucide-react';
+import { useVerifyDriver } from '@/hooks/driver.hooks';
 
 
 const defaultResendTime = 120
-const Verify_Otp_Form = () => {
+const Verify_Otp_Form = ({ mode }: { mode: "driver" | "user" }) => {
     const otpSlotClass = 'size-12 border-1 border-rose-400 data-[active=true]:border-rose-400'
-    const { mutate, isPending } = useEmailVerify()
+    const { mutate: UserVerify, isPending: UserVerifyPending } = useEmailVerify()
+    const { mutate: DriverVerify, isPending: DriverVerifyPending } = useVerifyDriver()
     const searchParams = useSearchParams()
     const email = searchParams.get("email") || ""
     const [isInValid, setInvalid] = useState(false)
@@ -22,6 +23,9 @@ const Verify_Otp_Form = () => {
     const [isResend, setIsResend] = useState(defaultResendTime)
 
 
+
+
+    const verify = mode === "driver" ? DriverVerify : UserVerify
 
 
     useEffect(() => {
@@ -60,7 +64,7 @@ const Verify_Otp_Form = () => {
         }
 
 
-        mutate(payload, {
+        verify(payload, {
             onSuccess: (res) => {
                 console.log(res);
                 toast.add({
@@ -122,13 +126,13 @@ const Verify_Otp_Form = () => {
             </div>
 
             <button
-                disabled={isPending}
+                disabled={UserVerifyPending || DriverVerifyPending}
                 type="submit"
                 form='otp-form'
                 className="h-11 w-full rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
             >
                 {
-                    isPending ? <div className="flex justify-center">
+                   UserVerifyPending || DriverVerifyPending ? <div className="flex justify-center">
                         <Spinner className="size-5 text-white font-bold"></Spinner>
                     </div> : "Verify account"
                 }
@@ -140,7 +144,7 @@ const Verify_Otp_Form = () => {
 
                     <span className="text-[12px] mt-3 text-rose-500">Resend OTP in {isResend} s</span>
                 </div>
-                )}
+            )}
 
             <p className="mt-3  text-center text-sm text-muted-foreground">
                 Didn&apos;t receive the code?{" "}
@@ -151,7 +155,7 @@ const Verify_Otp_Form = () => {
                 >
                     Resend OTP
                 </button>
-                
+
             </p>
 
         </div>

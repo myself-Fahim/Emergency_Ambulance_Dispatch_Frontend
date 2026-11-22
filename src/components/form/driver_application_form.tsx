@@ -18,23 +18,17 @@ import { FieldError, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
 import { toast } from "../ui/toast";
 import { Label } from "../ui/label";
-import {
-  Eligible_File_Type,
-  Max_File_Size,
-} from "@/validation/driver.application";
 import { ApplciationDriverSchema } from "../../validation/driver.application";
-import { useMutation } from "@tanstack/react-query";
-import { doctorApplicationApi } from "@/api/doctor.api";
 import { Spinner } from "../ui/spinner";
-import { LoginError, LoginResponse } from "@/types/auth.types";
-import { FetchError } from "ofetch";
-import { doctorApplication } from "@/types/doctor.type";
+import { useRouter } from "next/navigation";
+import { useDriverApplication } from "@/hooks/driver.hooks";
+
 
 const Driver_Application_Form = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const { mutate, isPending } = useMutation<LoginResponse, FetchError<LoginError>, doctorApplication>({
-    mutationFn: doctorApplicationApi
-  })
+  const { mutate, isPending } = useDriverApplication()
+
+  const router = useRouter()
 
 
   const form = useForm({
@@ -69,7 +63,9 @@ const Driver_Application_Form = () => {
             title: "Application submitted",
             description: res.message ?? "Application created and email sent",
           });
+          const params = new URLSearchParams({email:data.payload.email})
           form.reset();
+          router.push(`/driver_application/verify-otp?${params}`)
 
         },
         onError: (err) => {

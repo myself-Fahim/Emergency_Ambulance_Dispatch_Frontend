@@ -31,7 +31,7 @@ const VerifyRegOtp = () => {
 
                         <Suspense fallback={<p>Loading...</p>}>
 
-                            <Verify_Otp_Form></Verify_Otp_Form>
+                            <Verify_Otp_Form mode="user"></Verify_Otp_Form>
 
                         </Suspense>
 
