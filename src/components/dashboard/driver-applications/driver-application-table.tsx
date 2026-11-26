@@ -13,12 +13,17 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
+import { toast } from "@/components/ui/toast";
 
 import { DriverApplicationSummary } from "./driver-application-summary";
 import { DriverApplicationSearch } from "./driver-application-search";
 import { useGetDriverApplication } from "@/hooks/driver.hooks";
+import { useApproveDriverApplication } from "@/hooks/driver.hooks";
+import { useRejectDriverApplication } from "@/hooks/driver.hooks";
 import { TGetDriverApplication } from "@/types/driver.type";
 import AuthLoading from "@/components/auth/authLoading";
+import { useState } from "react";
 
 const statusStyles = {
   PENDING: "bg-amber-500/10 text-amber-700 dark:text-amber-300",
@@ -26,17 +31,58 @@ const statusStyles = {
   REJECTED: "bg-rose-500/10 text-rose-700 dark:text-rose-300",
 };
 
-
-
-
-
-
-
-
 export function DriverApplicationTable() {
   const { data, isPending, isFetching } = useGetDriverApplication()
+  const { mutate: approveDriver, isPending: isApproving } = useApproveDriverApplication()
+  const { mutate: rejectDriver, isPending: isRejecting } = useRejectDriverApplication()
+  const [approvingId, setApprovingId] = useState<string | null>(null)
+  const [rejectingId, setRejectingId] = useState<string | null>(null)
   const applications = data?.data.length > 0 ? data?.data : []
   const isLoading = isPending || isFetching
+
+  const handleApprove = (application: TGetDriverApplication) => {
+    setApprovingId(application.id)
+    approveDriver(application.id, {
+      onSuccess: (response) => {
+        toast.add({
+          type: "success",
+          title: "Application approved",
+          description: response?.message ?? `${application.name}'s application was approved.`,
+        })
+        setApprovingId(null)
+      },
+      onError: (error) => {
+        toast.add({
+          type: "error",
+          title: "Approval failed",
+          description: error.data?.message ?? "Unable to approve the application.",
+        })
+        setApprovingId(null)
+      },
+    })
+  }
+
+  const handleReject = (application: TGetDriverApplication) => {
+    setRejectingId(application.id)
+    rejectDriver(application.id, {
+      onSuccess: (response) => {
+        toast.add({
+          type: "success",
+          title: "Application rejected",
+          description: response?.message ?? `${application.name}'s application was rejected.`,
+        })
+        setRejectingId(null)
+      },
+      onError: (error) => {
+        toast.add({
+          type: "error",
+          title: "Rejection failed",
+          description: error.data?.message ?? "Unable to reject the application.",
+        })
+        setRejectingId(null)
+      },
+    })
+  }
 
   return (
     <>
@@ -132,8 +178,14 @@ export function DriverApplicationTable() {
                                   className="text-emerald-600 hover:text-emerald-700"
                                   aria-label={`Approve ${application.name}`}
                                   title="Approve application"
+                                  disabled={isApproving && approvingId === application.id}
+                                  onClick={() => handleApprove(application)}
                                 >
-                                  <Check className="size-4" aria-hidden="true" />
+                                  {isApproving && approvingId === application.id ? (
+                                    <Spinner className="size-4" />
+                                  ) : (
+                                    <Check className="size-4" aria-hidden="true" />
+                                  )}
                                 </Button>
                                 <Button
                                   type="button"
@@ -142,20 +194,18 @@ export function DriverApplicationTable() {
                                   className="text-rose-600 hover:text-rose-700"
                                   aria-label={`Reject ${application.name}`}
                                   title="Reject application"
+                                  disabled={isRejecting && rejectingId === application.id}
+                                  onClick={() => handleReject(application)}
                                 >
-                                  <X className="size-4" aria-hidden="true" />
+                                  {isRejecting && rejectingId === application.id ? (
+                                    <Spinner className="size-4" />
+                                  ) : (
+                                    <X className="size-4" aria-hidden="true" />
+                                  )}
                                 </Button>
                               </>
                             ) : null}
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon-sm"
-                              aria-label={`More options for ${application.name}`}
-                              title="More options"
-                            >
-                              <CircleEllipsis className="size-4" aria-hidden="true" />
-                            </Button>
+                        
                           </div>
                         </td>
                       </tr>

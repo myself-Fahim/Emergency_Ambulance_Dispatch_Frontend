@@ -1,7 +1,7 @@
-import { driverApplicationApi, driverEmailVerify, getDriverApplicationApi } from "@/api/driver.api"
+import { approveDriverApplicationApi, driverApplicationApi, driverEmailVerify, getDriverApplicationApi, rejectDriverApplicationApi } from "@/api/driver.api"
 import { LoginError, LoginResponse } from "@/types/auth.types"
 import { TDriverApplication, TDriverEmailVerify } from "@/types/driver.type"
-import { useMutation, useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { FetchError } from "ofetch"
 
 export const useDriverApplication = () => {
@@ -24,6 +24,32 @@ export const useGetDriverApplication = () => {
     queryKey: ['driver-applications'],
     queryFn: getDriverApplicationApi
 
+  })
+}
+
+export const useApproveDriverApplication = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation<LoginResponse, FetchError<LoginError>, string>({
+    mutationFn: approveDriverApplicationApi,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["driver-applications"],
+      })
+    },
+  })
+}
+
+export const useRejectDriverApplication = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation<LoginResponse, FetchError<LoginError>, string>({
+    mutationFn: rejectDriverApplicationApi,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["driver-applications"],
+      })
+    },
   })
 }
 

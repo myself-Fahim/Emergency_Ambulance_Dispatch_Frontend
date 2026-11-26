@@ -26,3 +26,15 @@ export const getDriverApplicationApi = () =>{
 
 }
 
+export const approveDriverApplicationApi = (applicationId: string) => {
+    return ofetchClient(`/driver/application/approved/${applicationId}`, {
+        method: "PATCH",
+    })
+}
+
+export const rejectDriverApplicationApi = (applicationId: string) => {
+    return ofetchClient(`/driver/application/reject/${applicationId}`, {
+        method: "DELETE",
+    })
+}
+
