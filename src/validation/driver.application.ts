@@ -21,8 +21,7 @@ export const ApplciationDriverSchema = z.object({
     phone: z
         .string({ error: "Phone number is required" })
         .trim()
-        .regex(BD_PHONE_REGEX, "Enter a valid Bangladeshi phone number")
-        .transform((v) => v.replace(/^\+?88/, "")),
+        .regex(BD_PHONE_REGEX, "Enter a valid Bangladeshi phone number"),
     license: z
         .file()
         .max(5 * 1024 * 1024, "File must be 5 MB or smaller")

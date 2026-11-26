@@ -21,4 +21,8 @@ export const driverEmailVerify = (payload : TDriverEmailVerify) =>{
     })
 
 }
+export const getDriverApplicationApi = () =>{
+    return ofetchClient("/driver/application")
+
+}
 

@@ -14,10 +14,10 @@ const Navbar = () => {
         { name: 'About us', url: "/about" }
     ]
 
-    const { mutate, isPending } = useLogout()
+    const { mutate} = useLogout()
 
     const { data, isLoading } = useGetMe()
-    console.log(data);
+
 
     const user = data?.data;
 

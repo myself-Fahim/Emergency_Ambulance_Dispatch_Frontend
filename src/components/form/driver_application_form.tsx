@@ -93,7 +93,6 @@ const Driver_Application_Form = () => {
       <div className="grid gap-5 sm:grid-cols-2">
         <form.Field name="name">
           {(field) => (
-            
             <div className="flex flex-col gap-2">
               <FieldLabel htmlFor={field.name}>Full name</FieldLabel>
               <div className="relative">

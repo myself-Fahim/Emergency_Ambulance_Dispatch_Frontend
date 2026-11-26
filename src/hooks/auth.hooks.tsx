@@ -52,7 +52,7 @@ export const useEmailVerify = () =>{
 
 export const useGoogleLogin = () =>{
   const queryClient = useQueryClient()
-  return useMutation({
+  return useMutation<LoginResponse, FetchError<LoginError>, {idToken:string}>({
     mutationFn:googleLoginApi,
     onSuccess: async () => {
     await queryClient.invalidateQueries({

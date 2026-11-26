@@ -1,10 +1,11 @@
-import React from 'react';
+import AuthGuard from '@/components/auth/authguard';
+import  { ReactNode } from 'react';
 
-const DashboardLayout = () => {
+const DashboardLayout = ({children}:{children : ReactNode}) => {
     return (
-        <div>
-            
-        </div>
+        <AuthGuard>
+          {children}
+        </AuthGuard>
     );
 };
 

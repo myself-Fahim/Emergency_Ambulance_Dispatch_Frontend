@@ -28,7 +28,7 @@ const GoogleLoginComponent = () => {
                 console.log(res);
                 toast.add({
                     title: " Login Success",
-                    description: res.data.message ?? "User logged in successful",
+                    description: res.message ?? "User logged in successfully",
                     type: "success"
                 })
 
@@ -39,7 +39,7 @@ const GoogleLoginComponent = () => {
             onError: (err) => {
                 toast.add({
                     title: " Login Failed",
-                    description: err.message ?? "Something went wrong",
+                    description: err.data?.message ?? "Something went wrong",
                     type: "error"
                 })
             }
