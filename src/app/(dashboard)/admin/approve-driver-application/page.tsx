@@ -1,8 +1,4 @@
-import { DriverApplicationSearch } from "@/components/dashboard/driver-applications/driver-application-search";
-import { DriverApplicationSummary } from "@/components/dashboard/driver-applications/driver-application-summary";
-import {
-  DriverApplicationTable,
-} from "@/components/dashboard/driver-applications/driver-application-table";
+import { DriverApplicationTable } from "@/components/dashboard/driver-applications/driver-application-table";
 
 const ApproveDriverApplication = () => {
   return (
@@ -20,10 +16,8 @@ const ApproveDriverApplication = () => {
             emergency response network.
           </p>
         </div>
-       
       </div>
 
-     
       <DriverApplicationTable />
     </main>
   );

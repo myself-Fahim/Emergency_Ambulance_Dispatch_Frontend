@@ -26,6 +26,8 @@ export const getDriverApplicationApi = () =>{
 
 }
 
+export const getDriversApi = () => ofetchClient("/driver")
+
 export const approveDriverApplicationApi = (applicationId: string) => {
     return ofetchClient(`/driver/application/approved/${applicationId}`, {
         method: "PATCH",
