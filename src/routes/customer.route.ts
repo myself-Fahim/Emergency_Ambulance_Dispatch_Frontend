@@ -1,6 +1,10 @@
 export const customerRoutes = [
   {
-    title: "Account",
-    items: [{ title: "Profile", url: "/customer/profile" }],
+    title: "Customer workspace",
+    items: [
+      { title: "Ambulances", url: "/customer/ambulance" },
+      { title: "My Bookings", url: "/customer/my-bookings" },
+      { title: "Profile", url: "/customer/profile" },
+    ],
   },
 ];

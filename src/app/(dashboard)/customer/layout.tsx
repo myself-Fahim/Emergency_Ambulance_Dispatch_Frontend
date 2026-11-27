@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/a11y/useValidAriaRole: <explanation> */
 import RoleGuard from '@/components/auth/roleguard';
 import DashboardShell from '@/components/dashboard/dashboard_shell';
 import React, { ReactNode } from 'react';

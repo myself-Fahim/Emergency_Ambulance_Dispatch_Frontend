@@ -1,7 +1,7 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { FetchError } from "ofetch";
 
-import { createAmbulanceApi } from "@/api/ambulance.api";
+import { createAmbulanceApi, getAmbulanceApi, getAmbulancesApi } from "@/api/ambulance.api";
 import type { TCreateAmbulancePayload } from "@/types/ambulance.type";
 
 export const useCreateAmbulance = () => {
@@ -12,3 +12,13 @@ export const useCreateAmbulance = () => {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["ambulances"] }),
   });
 };
+
+export const useGetAmbulances = () =>
+  useQuery({ queryKey: ["ambulances"], queryFn: getAmbulancesApi });
+
+export const useGetAmbulance = (ambulanceId?: string) =>
+  useQuery({
+    queryKey: ["ambulances", ambulanceId],
+    queryFn: () => getAmbulanceApi(ambulanceId as string),
+    enabled: Boolean(ambulanceId),
+  });

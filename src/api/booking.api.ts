@@ -1,8 +1,21 @@
 import ofetchClient from "@/lib/ofetch";
 import type { TGetBookingResponse } from "@/types/booking.type";
 
+export type TCreateBookingPayload = {
+  customerName: string;
+  customerPhone: string;
+  emergencyType: string;
+  ambulanceType: string;
+  pickupAddress: string;
+};
+
 export const getBookingApi = () =>
   ofetchClient<TGetBookingResponse>("/bookings");
+
+export const getMyBookingsApi = () => ofetchClient<TGetBookingResponse>("/bookings/my");
+
+export const createBookingApi = (payload: TCreateBookingPayload) =>
+  ofetchClient("/bookings", { method: "POST", body: payload });
 
 export const getMyAssignedBookingsApi = (driverId: string) =>
   ofetchClient<TGetBookingResponse>(`/bookings/my-assign/${driverId}`);

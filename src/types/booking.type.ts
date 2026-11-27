@@ -10,7 +10,7 @@ export type TBookingStatus =
 
 export type TBookingPriority = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
 
-export type TEmergencyType = "ACCIDENT" | "FIRE" | "MEDICAL" | "OTHER";
+export type TEmergencyType = "ACCIDENT" | "CARDIAC" | "PREGNANCY" | "FIRE" | "OTHER";
 
 export type TPaymentStatus = "PENDING" | "PAID" | "FAILED" | "REFUNDED";
 

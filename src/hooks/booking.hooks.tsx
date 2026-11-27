@@ -5,14 +5,28 @@ import {
   cancelBookingApi,
   completeBookingApi,
   getBookingApi,
+  getMyBookingsApi,
+  createBookingApi,
   getMyAssignedBookingsApi,
   startBookingApi,
 } from "@/api/booking.api";
+import type { TCreateBookingPayload } from "@/api/booking.api";
 
 export const useGetBookings = () => {
   return useQuery({
     queryKey: ["bookings"],
     queryFn: getBookingApi,
+  });
+};
+
+export const useGetMyBookings = () =>
+  useQuery({ queryKey: ["my-bookings"], queryFn: getMyBookingsApi });
+
+export const useCreateBooking = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: TCreateBookingPayload) => createBookingApi(payload),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["my-bookings"] }),
   });
 };
 

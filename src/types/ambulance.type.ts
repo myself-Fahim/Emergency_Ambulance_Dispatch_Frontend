@@ -11,3 +11,15 @@ export type TCreateAmbulancePayload = {
     type: TAmbulanceType;
   };
 };
+
+export type TAmbulance = {
+  id: string;
+  registrationNumber: string;
+  providerId: string;
+  type: TAmbulanceType | string;
+  status: "AVAILABLE" | "BUSY" | "MAINTAINANCE" | "UNAVAILABLE" | string;
+  provider?: { id: string; name: string; phone: string; email: string; address: string | null };
+};
+
+export type TAmbulanceListResponse = { data: TAmbulance[]; message?: string };
+export type TAmbulanceResponse = { data: TAmbulance; message?: string };
