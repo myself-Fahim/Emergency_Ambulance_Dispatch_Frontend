@@ -11,6 +11,10 @@ export const adminRoutes = [
         url: "/admin/approve-driver-application",
       },
       {
+        title: "Create Ambulance",
+        url: "/admin/ambulance/create",
+      },
+      {
         title: "Bookings",
         url: "/admin/booking",
       },

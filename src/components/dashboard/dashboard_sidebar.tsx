@@ -49,6 +49,7 @@ const routeIcons = {
   "Approve Driver": ClipboardCheck,
   "Live Tracking": MapPin,
   "My Requests": Siren,
+  "My Bookings": ClipboardCheck,
   "My Ambulance": Ambulance,
   Users,
   Reports: BarChart3,

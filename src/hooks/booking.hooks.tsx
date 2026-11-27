@@ -1,9 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   assignBookingApi,
+  acceptBookingApi,
   cancelBookingApi,
   completeBookingApi,
   getBookingApi,
+  getMyAssignedBookingsApi,
   startBookingApi,
 } from "@/api/booking.api";
 
@@ -14,6 +16,13 @@ export const useGetBookings = () => {
   });
 };
 
+export const useGetMyAssignedBookings = (driverId?: string) =>
+  useQuery({
+    queryKey: ["my-assigned-bookings", driverId],
+    queryFn: () => getMyAssignedBookingsApi(driverId as string),
+    enabled: Boolean(driverId),
+  });
+
 export const useAssignBooking = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -23,11 +32,18 @@ export const useAssignBooking = () => {
   });
 };
 
+export const useAcceptBooking = () => useBookingStatusMutation(acceptBookingApi);
+
 const useBookingStatusMutation = (mutationFn: (bookingId: string) => Promise<unknown>) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["bookings"] }),
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["bookings"] }),
+        queryClient.invalidateQueries({ queryKey: ["my-assigned-bookings"] }),
+      ]);
+    },
   });
 };
 

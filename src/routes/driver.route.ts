@@ -1,16 +1,9 @@
 export const driverRoutes = [
-        {
-            title: "Management",
-            items: [
-                {
-                    title: "Overview",
-                    url: "/admin",
-                },
-                {
-                    title: "Approve Driver",
-                    url: "/admin/approve-driver-application",
-                },
-            ],
-        },
-
-    ]
+  {
+    title: "Management",
+    items: [
+      { title: "Overview", url: "/driver" },
+      { title: "My Bookings", url: "/driver/my-bookings" },
+    ],
+  },
+];
