@@ -18,6 +18,10 @@ export const adminRoutes = [
         title: "Bookings",
         url: "/admin/booking",
       },
+      {
+        title: "Profile",
+        url: "/admin/profile",
+      },
     ],
   },
 ];
